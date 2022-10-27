@@ -16,7 +16,7 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            useH2();
+         //   useH2();
             useMySql();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -37,7 +37,7 @@ public class Main {
             create(connection);
             insert(connection);
             update(connection);
-            delete(connection);
+           // delete(connection);
             read(connection);
 
         } catch (SQLException e) {
