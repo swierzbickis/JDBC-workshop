@@ -1,37 +1,45 @@
 package org.workshop.jdbc;
 
+import org.workshop.jdbc.connection.ConnectionFactory;
+import org.workshop.jdbc.dao.CustomerDAO;
+import org.workshop.jdbc.dao.CustomerDAOImpl;
+import org.workshop.jdbc.dto.CustomerDTO;
+
 import java.sql.*;
 
 public class Main2 {
 
     public static void main(String[] args) {
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            System.out.println("Brak sterownika");
-            e.printStackTrace();
-            System.exit(1);
-        }
 
-        Connection conn;
-        String strUrl = "jdbc:mysql://localhost:3306/testdb";
-        java.util.Properties props = new java.util.Properties();
-        props.put("user", "root");
-        props.put("password", "root");
-        try {
-            conn = DriverManager.getConnection(strUrl, props);
-            Statement statement = conn.createStatement();
-            ResultSet result = statement.executeQuery("select * from movies");
-            while (result.next()) {
-                System.out.println(result.getInt("id"));
-                System.out.println(result.getString("title"));
-                System.out.println(result.getString("genre"));
-            }
-            conn.close();
+        createDatabase();
+        CustomerDAO customerDAO = new CustomerDAOImpl();
+
+        customerDAO.save(new CustomerDTO("Jan", "Kowalski", "jan.kowalski@gmail.com"));
+        //customerDAO.findById();
+
+        //  customerDAO.update(); //name update
+        // customerDAO.findByName();
+
+        // customerDAO.delete();
+
+        customerDAO.findAll()
+                .forEach(c -> System.out.println(c.toString()));
+
+    }
+
+    private static void createDatabase() {
+        try (Connection conn = ConnectionFactory.getConnection();
+             Statement statement = conn.createStatement()) {
+            statement.execute(
+                    "CREATE TABLE IF NOT EXISTS CUSTOMER (" +
+                            "ID INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT," +
+                            "FIRSTNAME VARCHAR(50)," +
+                            "LASTNAME  VARCHAR(50)," +
+                            "EMAIL     VARCHAR(50))"
+            );
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-
     }
 
 }
